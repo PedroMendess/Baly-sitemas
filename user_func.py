@@ -1,12 +1,10 @@
-from datetime import date
 from dataclasses import dataclass
 @dataclass
-class Usuario:
+class Usuario_Funcionario:
     email : str
-    telefone : int
     cpf  : int
     nome : str
     sobrenome : str
     password : str
-    dt_nasc : date
+    especialidade : str
     user_type: str
