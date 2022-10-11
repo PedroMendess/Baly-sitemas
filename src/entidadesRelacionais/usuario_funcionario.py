@@ -8,7 +8,5 @@ class Usuario_Funcionario(base):
     password = Column(String(256))
     especialidade = Column(String(256))
     email = Column(String(256))
-    cpf = Column(String(256))
-    sobrenome = Column(String(256))
     user_type = Column(String(256))
     delete = Column(SmallInteger, default= 0)

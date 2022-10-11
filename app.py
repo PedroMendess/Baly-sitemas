@@ -1,11 +1,15 @@
+from asyncio.windows_events import NULL
+from tkinter import E
 from flask import Flask, request
 from flask_cors import CORS
+from src.entidadesRelacionais import usuario
 from src.entidadesRelacionais.usuario_funcionario import Usuario_Funcionario
 from src.entidadesRelacionais.usuario import Usuario
 from cerberus import Validator
 from src.database.database import Database
 from datetime import datetime
 from typing import Union
+from sqlalchemy import select
 
 app = Flask(__name__)
 
@@ -56,9 +60,7 @@ def cadastrar_Funcionario ():
     # Validador de json cerberus 
     schema = {
         'email': {'type': 'string', 'required': True},
-        'cpf': {'type': 'string', 'required': True},
         'nome': {'type': 'string', 'required': True},
-        'sobrenome': {'type': 'string', 'required': True},
         'password': {'type': 'string', 'required': True},
         'especialidade': {'type': 'string', 'required': True},
         'user_type': {'type': 'string', 'required': True}
@@ -72,9 +74,7 @@ def cadastrar_Funcionario ():
     # json funcionario que irá ser passado para o banco
     usuario_funcionario = Usuario_Funcionario(
         email = json.get('email'),
-        cpf = json.get('cpf'),
         nome = json.get('nome'),
-        sobrenome = json.get('sobrenome'),
         password = json.get('password'),
         especialidade = json.get('especialidade'),
         user_type = json.get('user_type')
@@ -92,9 +92,22 @@ def cadastrarBanco(usuario: Union[Usuario,Usuario_Funcionario]):
     dbSession.commit()
     db.session_scoped.remove()
         
-
-app.run(debug=True)
-
 @app.route("/login_Funcionario", methods = ['POST'])
 def Login_Funcionario ():
-    
+        json = request.get_json()
+        user_email = json.get('email')
+        user_password = json.get('password')
+
+        db: Database = app.config['database']
+        dbSession = db.session_scoped()
+       
+
+        usuario_maluco = dbSession.query(dbSession.user_type).filter_by((dbSession.email == user_email) & (dbSession.password == user_password)).all()
+        if usuario_maluco != NULL:
+            return usuario_maluco
+        else:
+            return NULL    
+
+        
+
+app.run(debug=True)
